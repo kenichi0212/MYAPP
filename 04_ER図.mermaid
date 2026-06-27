@@ -1,0 +1,177 @@
+%% 賞味期限管理Webアプリ ER図
+%% 関連文書：01_要件定義書.md／02_仕様設計書.md／03_詳細設計書.md
+%%
+%% 凡例（フェーズ）
+%%   MVP対象     : companies, users, store_groups, stores, staff_master,
+%%                 products, product_store_assignments,
+%%                 csv_import_batches, csv_import_errors, expiry_check_logs
+%%   フェーズ2対象: disposal_logs, e_signatures, notifications
+%%   （03_詳細設計書 10.の合意により、フェーズ2テーブルもER図に含めている）
+
+erDiagram
+    COMPANIES {
+        bigint id PK
+        varchar name
+        datetime created_at
+    }
+
+    USERS {
+        bigint id PK
+        bigint company_id FK
+        varchar login_id
+        varchar password_hash
+        varchar name
+        varchar role "store_staff / hq_staff / admin"
+        bigint store_id FK "主所属店舗。店舗担当者用、NULL可"
+        bigint staff_master_id FK "NULL可"
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    STORE_GROUPS {
+        bigint id PK
+        bigint company_id FK
+        varchar group_code
+        varchar group_name
+    }
+
+    STORES {
+        bigint id PK
+        bigint company_id FK
+        bigint store_group_id FK "NULL可"
+        varchar store_code "CSV列名:店舗コード"
+        varchar store_name
+        varchar office_name
+        datetime created_at
+    }
+
+    STAFF_MASTER {
+        bigint id PK
+        bigint company_id FK
+        varchar staff_name
+        datetime created_at
+    }
+
+    PRODUCTS {
+        bigint id PK "内部ID（実質的な主キー）"
+        bigint company_id FK
+        varchar internal_product_code "自社商品コード。NULL可"
+        varchar jan_code "JANコード。NULL可・一意性なし"
+        varchar product_name
+        varchar maker_name
+        varchar name_source "master / api / manual"
+        datetime created_at
+        datetime updated_at
+    }
+
+    PRODUCT_STORE_ASSIGNMENTS {
+        bigint id PK
+        bigint company_id FK
+        bigint product_id FK
+        bigint store_id FK
+        bigint staff_master_id FK "NULL可"
+        bigint import_batch_id FK "NULL可"
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    CSV_IMPORT_BATCHES {
+        bigint id PK
+        bigint company_id FK
+        varchar file_name
+        varchar scope "all_stores / store_group"
+        bigint store_group_id FK "scope=store_groupの場合"
+        bigint imported_by FK
+        datetime imported_at
+        varchar detected_encoding
+        int total_rows
+        int success_count
+        int error_count
+    }
+
+    CSV_IMPORT_ERRORS {
+        bigint id PK
+        bigint import_batch_id FK
+        int row_number
+        varchar error_reason
+        text raw_line
+    }
+
+    EXPIRY_CHECK_LOGS {
+        bigint id PK
+        bigint company_id FK
+        bigint product_id FK
+        bigint store_id FK
+        date expiry_date "ロット識別の一部"
+        int quantity
+        boolean is_zero_report
+        varchar data_source "master / api / manual"
+        bigint checked_by FK
+        datetime checked_at
+        text note
+    }
+
+    DISPOSAL_LOGS {
+        bigint id PK
+        bigint company_id FK
+        bigint product_id FK
+        bigint store_id FK
+        date expiry_date
+        varchar process_type "disposal / discount / return / other"
+        int quantity
+        bigint processed_by FK
+        datetime processed_at
+        text note
+    }
+
+    E_SIGNATURES {
+        bigint id PK
+        bigint company_id FK
+        bigint store_id FK
+        varchar target_period "例:2026-06"
+        bigint signed_by FK
+        text signature_data "座標点列(ベクター形式)。画像より軽量"
+        datetime signed_at
+    }
+
+    NOTIFICATIONS {
+        bigint id PK
+        bigint company_id FK
+        bigint target_user_id FK
+        bigint product_id FK
+        bigint store_id FK
+        date expiry_date
+        int threshold_days
+        varchar channel "email / app"
+        datetime sent_at
+        varchar status "pending / sent / failed"
+    }
+
+    COMPANIES       ||--o{ USERS                      : "所属する"
+    COMPANIES       ||--o{ STORE_GROUPS               : "所属する"
+    COMPANIES       ||--o{ STORES                     : "所属する"
+    COMPANIES       ||--o{ STAFF_MASTER               : "所属する"
+    COMPANIES       ||--o{ PRODUCTS                   : "所属する"
+    STORE_GROUPS    ||--o{ STORES                     : "含む"
+    STORES          ||--o{ USERS                      : "主所属する"
+    STAFF_MASTER    ||--o{ USERS                      : "紐付く"
+    PRODUCTS        ||--o{ PRODUCT_STORE_ASSIGNMENTS  : "割当される"
+    STORES          ||--o{ PRODUCT_STORE_ASSIGNMENTS  : "割当される"
+    STAFF_MASTER    ||--o{ PRODUCT_STORE_ASSIGNMENTS  : "担当する"
+    CSV_IMPORT_BATCHES ||--o{ PRODUCT_STORE_ASSIGNMENTS : "取込で作成する"
+    STORE_GROUPS    ||--o{ CSV_IMPORT_BATCHES         : "対象とする(任意)"
+    USERS           ||--o{ CSV_IMPORT_BATCHES         : "実行する"
+    CSV_IMPORT_BATCHES ||--o{ CSV_IMPORT_ERRORS        : "発生させる"
+    PRODUCTS        ||--o{ EXPIRY_CHECK_LOGS          : "チェックされる"
+    STORES          ||--o{ EXPIRY_CHECK_LOGS          : "チェックされる"
+    USERS           ||--o{ EXPIRY_CHECK_LOGS          : "登録する"
+    PRODUCTS        ||--o{ DISPOSAL_LOGS              : "処理される"
+    STORES          ||--o{ DISPOSAL_LOGS              : "処理される"
+    USERS           ||--o{ DISPOSAL_LOGS              : "登録する"
+    STORES          ||--o{ E_SIGNATURES               : "署名される"
+    USERS           ||--o{ E_SIGNATURES               : "署名する"
+    USERS           ||--o{ NOTIFICATIONS              : "通知先となる"
+    PRODUCTS        ||--o{ NOTIFICATIONS              : "対象となる"
+    STORES          ||--o{ NOTIFICATIONS              : "対象となる"
