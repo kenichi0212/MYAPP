@@ -47,7 +47,7 @@
 ## フェーズ2：認証・権限基盤（F01）
 
 - [x] 2-1 Laravel BreezeログインUIをTailwindデザイン・日本語表記に調整
-- [ ] 2-2 `role`（`store_staff`/`hq_staff`/`admin`）に応じたアクセス制御をMiddleware／Policyとして実装
+- [x] 2-2 `role`（`store_staff`/`hq_staff`/`admin`）に応じたアクセス制御をMiddleware／Policyとして実装
 - [ ] 2-3 登録・編集（F04）は店舗担当者は自分の担当店舗（`store_id`一致）のみ許可するPolicy実装。閲覧系（F05〜F08）は同一`company_id`内であれば制限しないことを確認
 - [ ] 2-4 CSVインポート・マスタ管理は本社担当者・システム管理者のみ許可するPolicy実装
 - [ ] 2-5 ユーザー管理画面（システム管理者のみ、作成・編集・有効/無効切替の最小限CRUD）
