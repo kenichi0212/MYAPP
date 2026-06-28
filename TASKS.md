@@ -35,7 +35,7 @@
 - [x] 1-5 `staff_master`テーブル作成（一意制約：`company_id, staff_name`）
 - [x] 1-6 `products`テーブル作成（`internal_product_code`／`jan_code`／`name_source`等。部分一意インデックス：`internal_product_code`がNULLでない場合のみ`company_id, internal_product_code`を一意とする）
 - [ ] 1-7 `product_store_assignments`テーブル作成（一意制約：`company_id, product_id, store_id`）
-- [ ] 1-8 `csv_import_batches`／`csv_import_errors`テーブル作成
+- [x] 1-8 `csv_import_batches`／`csv_import_errors`テーブル作成
 - [ ] 1-9 `expiry_check_logs`テーブル作成（追記専用。インデックス：`company_id, store_id, expiry_date`、`company_id, product_id, store_id, expiry_date, checked_at`）
 - [ ] 1-10 全テーブルのEloquentモデル・リレーション定義（`belongsTo`/`hasMany`）
 - [ ] 1-11 Factory／Seederで開発用ダミーデータ投入（複数店舗・複数商品・複数履行を含むデータセット）
