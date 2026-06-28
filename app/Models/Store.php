@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Store extends Model
 {
@@ -25,5 +26,10 @@ class Store extends Model
     public function storeGroup(): BelongsTo
     {
         return $this->belongsTo(StoreGroup::class);
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
     }
 }
