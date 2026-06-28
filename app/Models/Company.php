@@ -32,4 +32,9 @@ class Company extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function csvImportBatches(): HasMany
+    {
+        return $this->hasMany(CsvImportBatch::class);
+    }
 }
