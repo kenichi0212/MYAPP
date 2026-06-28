@@ -29,7 +29,7 @@
 ## フェーズ1：データモデル・マイグレーション
 
 - [x] 1-1 `companies`テーブル作成 + シーダー（MVP用1社固定データ投入）
-- [ ] 1-2 `users`テーブル作成（`role`、`store_id`、`staff_master_id`含む。Breeze標準の`users`テーブルを拡張）
+- [x] 1-2 `users`テーブル作成（`role`、`store_id`、`staff_master_id`含む。Breeze標準の`users`テーブルを拡張）
 - [x] 1-3 `store_groups`テーブル作成（一意制約：`company_id, group_code`）
 - [x] 1-4 `stores`テーブル作成（一意制約：`company_id, store_code`）
 - [x] 1-5 `staff_master`テーブル作成（一意制約：`company_id, staff_name`）
