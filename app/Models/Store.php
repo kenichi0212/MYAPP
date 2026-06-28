@@ -32,4 +32,9 @@ class Store extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function productAssignments(): HasMany
+    {
+        return $this->hasMany(ProductStoreAssignment::class);
+    }
 }
