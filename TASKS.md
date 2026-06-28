@@ -13,14 +13,14 @@
 
 ## フェーズ0：環境構築
 
-- [ ] 0-1 Laravelプロジェクト作成（`composer create-project laravel/laravel`、最新LTS）
-- [ ] 0-2 Docker／Laravel Sail導入、`sail up -d`で起動確認
-- [ ] 0-3 Supabase上にPostgreSQLインスタンスを作成し、接続情報を`.env`に設定（ローカル開発はSail付属DBを使用し、本番接続のみSupabaseとする）
-- [ ] 0-4 Tailwind CSS導入（Laravel公式Vite+Tailwind構成）
-- [ ] 0-5 Laravel Breeze導入（Blade版、日本語化）
-- [ ] 0-6 GitHub Actions：PHPUnit自動実行ワークフロー作成（`.github/workflows/test.yml`、PR毎に実行）
-- [ ] 0-7 Renderへの初回デプロイ手順を確立（動作確認用の最小デプロイ）
-- [ ] 0-8 `.env.example`とREADME（セットアップ手順）を整備
+- [x] 0-1 Laravelプロジェクト作成（`composer create-project laravel/laravel`、最新LTS）
+- [x] 0-2 Docker／Laravel Sail導入、`sail up -d`で起動確認
+- [x] 0-3 Supabase上にPostgreSQLインスタンスを作成し、接続情報を`.env`に設定（ローカル開発はSail付属DBを使用し、本番接続のみSupabaseとする）
+- [x] 0-4 Tailwind CSS導入（Laravel公式Vite+Tailwind構成）
+- [x] 0-5 Laravel Breeze導入（Blade版、日本語化）
+- [x] 0-6 GitHub Actions：PHPUnit自動実行ワークフロー作成（`.github/workflows/test.yml`、PR毎に実行）
+- [x] 0-7 Renderへの初回デプロイ手順を確立（動作確認用の最小デプロイ）
+- [x] 0-8 `.env.example`とREADME（セットアップ手順）を整備
 
 **DoD**：`sail up -d`でローカル起動、`/`にアクセスしてLaravelデフォルト画面（またはBreezeログイン画面）が表示される。GitHub Actions上でPHPUnitが（テスト0件でも）グリーンになる。
 
