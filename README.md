@@ -1,66 +1,84 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 賞味期限管理Webアプリ
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+納品先売場向けの賞味期限チェック業務を効率化するWebアプリケーション。現在Excelで行っている「バーコード読取→入力→CSV加工→Excel転記」の業務フローを置き換え、二重入力・チェック漏れを解消することを目的とする。
 
-## About Laravel
+詳細な仕様は [SPEC.md](SPEC.md)、実装タスクの分解は [TASKS.md](TASKS.md)、開発方針は [CLAUDE.md](CLAUDE.md) を参照。
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 技術スタック
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| 区分 | 技術 |
+|---|---|
+| バックエンド | PHP / Laravel 11 |
+| 認証 | Laravel Breeze（Blade版） |
+| フロントエンド | Laravel Blade + Tailwind CSS |
+| データベース | PostgreSQL（ローカルはLaravel Sail付属DB、本番はSupabase） |
+| ローカル開発環境 | Docker / Laravel Sail |
+| テスト | PHPUnit |
+| CI | GitHub Actions |
+| 本番ホスティング | Render（Dockerデプロイ） |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## セットアップ（ローカル開発）
 
-## Learning Laravel
+### 前提
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Docker Desktop（WSL2バックエンド推奨）
+- **Windows環境の場合**：Laravel Sailの起動スクリプトは`uname -s`が`Linux`または`Darwin`であることを前提としているため、素のGit Bash（MINGW64）では動作しない。**WSL2（Ubuntu等）上で実行する**か、後述の「Sailを使わない代替手順」でDocker Composeを直接操作すること。
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 手順
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+# 1. リポジトリをクローン
+git clone git@github.com:kenichi0212/MYAPP.git
+cd MYAPP
 
-## Laravel Sponsors
+# 2. .envを作成
+cp .env.example .env
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 3. Sail起動（WSL2上のbashで実行）
+./vendor/bin/sail up -d
 
-### Premium Partners
+# 4. APP_KEY生成
+./vendor/bin/sail artisan key:generate
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# 5. マイグレーション + シード
+./vendor/bin/sail artisan migrate --seed
 
-## Contributing
+# 6. フロントエンドアセットビルド
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+`http://localhost/` にアクセスして起動を確認する。
 
-## Code of Conduct
+### Sailを使わない代替手順（WSL2のDocker統合が無効な場合）
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Windows側のDocker Desktopが起動していれば、`docker compose`を直接呼び出すことでも同様に動作する。
 
-## Security Vulnerabilities
+```bash
+docker compose -f compose.yaml up -d
+docker exec -u sail myapp-laravel.test-1 composer install
+docker exec -u sail myapp-laravel.test-1 npm install
+docker exec -u sail myapp-laravel.test-1 npm run build
+docker exec -u sail myapp-laravel.test-1 php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+`docker exec`は`-u sail`を付けて実行すること。付けずに実行すると生成物がroot所有になり、コンテナ内のWebサーバープロセス（sailユーザーで起動）が`storage/`配下に書き込めずエラーになる。
 
-## License
+## テスト
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+./vendor/bin/sail artisan test
+```
+
+GitHub Actions（`.github/workflows/test.yml`）でPull Request・main push時に自動実行される。
+
+## 本番デプロイ（Render + Supabase）
+
+- データベースはSupabaseのPostgreSQLを使用する。Supabaseの「Direct connection」はIPv6専用ホストのため、IPv6非対応のRenderからは接続できない。**「Session pooler」の接続情報を使用すること**。
+- 本番用の接続情報は`.env.production`（gitignore対象、リポジトリには含めない）にローカルで保管し、Renderの環境変数に登録する。`render.yaml`に環境変数の構成一覧を記載している（値は手動入力）。
+- デプロイは`Dockerfile`を使用したDockerビルド。RenderはPHPのネイティブランタイムを提供していないため必須。
+- RenderはTLSをロードバランサー側で終端しHTTPでコンテナに転送するため、`bootstrap/app.php`で`trustProxies(at: '*')`を設定している（未設定だとCSS/JSがhttpの絶対URLで生成され、HTTPS配信時にMixed Contentでブロックされる）。
+
+## 開発用デモログイン
+
+ログイン画面に「開発用デモユーザーでログイン」ボタンを用意している（`APP_ENV=production`以外でのみ表示）。パスワード入力なしでシード済みのデモユーザーとしてログインできる。
