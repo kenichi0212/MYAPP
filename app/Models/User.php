@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -66,5 +67,15 @@ class User extends Authenticatable
     public function staffMember(): BelongsTo
     {
         return $this->belongsTo(StaffMember::class, 'staff_master_id');
+    }
+
+    public function checkLogs(): HasMany
+    {
+        return $this->hasMany(ExpiryCheckLog::class, 'checked_by');
+    }
+
+    public function importedCsvBatches(): HasMany
+    {
+        return $this->hasMany(CsvImportBatch::class, 'imported_by');
     }
 }

@@ -26,4 +26,9 @@ class StoreGroup extends Model
     {
         return $this->hasMany(Store::class);
     }
+
+    public function csvImportBatches(): HasMany
+    {
+        return $this->hasMany(CsvImportBatch::class);
+    }
 }
