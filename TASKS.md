@@ -38,7 +38,7 @@
 - [x] 1-8 `csv_import_batches`／`csv_import_errors`テーブル作成
 - [x] 1-9 `expiry_check_logs`テーブル作成（追記専用。インデックス：`company_id, store_id, expiry_date`、`company_id, product_id, store_id, expiry_date, checked_at`）
 - [x] 1-10 全テーブルのEloquentモデル・リレーション定義（`belongsTo`/`hasMany`）
-- [ ] 1-11 Factory／Seederで開発用ダミーデータ投入（複数店舗・複数商品・複数履行を含むデータセット）
+- [x] 1-11 Factory／Seederで開発用ダミーデータ投入（複数店舗・複数商品・複数履行を含むデータセット）
 
 **DoD**：`sail artisan migrate:fresh --seed`が成功し、開発用データがDB上で確認できる。SPEC.md 9.2の各テーブル定義とマイグレーションの整合を確認済み。
 
