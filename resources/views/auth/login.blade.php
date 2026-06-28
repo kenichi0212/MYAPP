@@ -44,4 +44,15 @@
             </x-primary-button>
         </div>
     </form>
+
+    @if (! app()->environment('production'))
+        <div class="mt-4 pt-4 border-t border-gray-200">
+            <form method="POST" action="{{ route('dev-login') }}">
+                @csrf
+                <button type="submit" class="text-sm text-gray-500 underline hover:text-gray-700">
+                    開発用デモユーザーでログイン（本番では表示されません）
+                </button>
+            </form>
+        </div>
+    @endif
 </x-guest-layout>
