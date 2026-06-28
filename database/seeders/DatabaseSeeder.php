@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
 
         User::firstOrCreate(
             ['email' => 'demo@example.com'],
-            User::factory()->raw(['name' => '開発用デモユーザー'])
+            ['name' => '開発用デモユーザー', 'password' => bcrypt('password')]
         );
     }
 }

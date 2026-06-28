@@ -37,4 +37,9 @@ class Store extends Model
     {
         return $this->hasMany(ProductStoreAssignment::class);
     }
+
+    public function checkLogs(): HasMany
+    {
+        return $this->hasMany(ExpiryCheckLog::class);
+    }
 }
