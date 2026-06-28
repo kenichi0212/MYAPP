@@ -19,5 +19,11 @@ class DatabaseSeeder extends Seeder
             ['email' => 'demo@example.com'],
             ['name' => '開発用デモユーザー', 'password' => bcrypt('password')]
         );
+
+        // 複数店舗・複数商品・複数履行のダミーデータはローカル開発でのみ投入する
+        // （テスト実行時間への影響を避けるため）。
+        if (app()->environment('local')) {
+            $this->call(DevDataSeeder::class);
+        }
     }
 }
