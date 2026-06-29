@@ -37,4 +37,13 @@ enum UserRole: string
     {
         return $this === self::Admin;
     }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::StoreStaff => '店舗担当者',
+            self::HqStaff => '本社担当者',
+            self::Admin => 'システム管理者',
+        };
+    }
 }

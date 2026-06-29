@@ -1,0 +1,23 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            ユーザー新規作成
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <form method="POST" action="{{ route('users.store') }}">
+                    @csrf
+
+                    @include('users._form', ['stores' => $stores])
+
+                    <div class="flex items-center justify-end mt-6">
+                        <x-primary-button>作成する</x-primary-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

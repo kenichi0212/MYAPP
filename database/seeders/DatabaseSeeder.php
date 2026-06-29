@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,6 +19,11 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'demo@example.com'],
             ['name' => '開発用デモユーザー', 'password' => bcrypt('password')]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            ['name' => '開発用管理者', 'password' => bcrypt('password'), 'role' => UserRole::Admin]
         );
 
         // 複数店舗・複数商品・複数履行のダミーデータはローカル開発でのみ投入する
