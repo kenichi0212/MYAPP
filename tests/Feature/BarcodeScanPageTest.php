@@ -23,6 +23,8 @@ class BarcodeScanPageTest extends TestCase
             ->get(route('barcode-scan.create'))
             ->assertOk()
             ->assertSee('バーコード読取')
-            ->assertSeeHtml('id="scanner-video"');
+            ->assertSeeHtml('id="scanner-video"')
+            ->assertSeeHtml('id="manual-jan-code"')
+            ->assertSee('JANコードを手入力する');
     }
 }
