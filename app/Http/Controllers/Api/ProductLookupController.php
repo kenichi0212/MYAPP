@@ -21,12 +21,8 @@ class ProductLookupController extends Controller
 
         $result = $this->productLookupService->lookup(auth()->user()->company_id, $validated['jan_code']);
 
-        if (! $result['found']) {
-            return response()->json(['found' => false]);
-        }
-
         return response()->json([
-            'found' => true,
+            'found' => $result['found'],
             'product' => [
                 'product_name' => $result['product_name'],
                 'maker_name' => $result['maker_name'],

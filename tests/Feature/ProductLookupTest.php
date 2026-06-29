@@ -80,7 +80,10 @@ class ProductLookupTest extends TestCase
         $this->actingAs($user)
             ->getJson('/api/products/lookup?jan_code=4901234567894')
             ->assertOk()
-            ->assertJson(['found' => false]);
+            ->assertJson([
+                'found' => false,
+                'product' => ['name_source' => 'manual'],
+            ]);
     }
 
     public function test_does_not_match_products_belonging_to_another_company(): void
