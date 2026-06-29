@@ -12,8 +12,10 @@ class CompanySeeder extends Seeder
      */
     public function run(): void
     {
+        // MVPでは1社固定運用のため、idを明示指定せず自動採番に任せる
+        // （明示指定するとPostgresの自動採番シーケンスが追従せず、
+        // 後続のCompany::create()でid重複エラーになる）。
         Company::firstOrCreate(
-            ['id' => 1],
             ['name' => 'テスト株式会社']
         );
     }
