@@ -65,7 +65,7 @@
 - [x] 3-4 必須項目チェック・行単位バリデーション実装（店舗コード必須、JANコードまたは自社商品コードのいずれか必須等）
 - [x] 3-5 `store_groups`／`stores`／`staff_master`のアップサート処理実装
 - [x] 3-6 `products`のマッチング優先順位ロジック実装（SPEC.md 10.1：①自社商品コード→②JANコード→③新規）
-- [ ] 3-7 `product_store_assignments`のアップサート処理実装（`import_batch_id`付与）
+- [x] 3-7 `product_store_assignments`のアップサート処理実装（`import_batch_id`付与）
 - [ ] 3-8 取込結果プレビュー表示→確定の2段階フロー実装
 - [ ] 3-9 `csv_import_batches`／`csv_import_errors`への記録実装
 - [ ] 3-10 CSVインポートのFeatureテスト作成（正常系／必須項目欠落／文字コード混在／優先順位マッチングの分岐網羅）
