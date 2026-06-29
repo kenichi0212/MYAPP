@@ -3,9 +3,13 @@
 namespace Tests\Feature\Csv;
 
 use App\Models\Company;
+use App\Models\CsvImportBatch;
+use App\Models\Product;
+use App\Models\ProductStoreAssignment;
 use App\Models\StaffMember;
 use App\Models\Store;
 use App\Models\StoreGroup;
+use App\Models\User;
 use App\Services\Csv\CsvMasterDataUpserter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -133,5 +137,80 @@ class CsvMasterDataUpserterTest extends TestCase
 
         $this->assertNull($upserter->upsertStaffMember($company->id, null));
         $this->assertDatabaseCount('staff_master', 0);
+    }
+
+    public function test_upsert_product_store_assignment_creates_new_assignment(): void
+    {
+        $company = Company::first();
+        $product = Product::factory()->create(['company_id' => $company->id]);
+        $store = Store::factory()->create(['company_id' => $company->id]);
+        $staff = StaffMember::factory()->create(['company_id' => $company->id]);
+        $batch = $this->makeImportBatch($company->id);
+        $upserter = new CsvMasterDataUpserter();
+
+        $assignment = $upserter->upsertProductStoreAssignment(
+            $company->id,
+            $product->id,
+            $store->id,
+            $staff->id,
+            $batch->id,
+        );
+
+        $this->assertInstanceOf(ProductStoreAssignment::class, $assignment);
+        $this->assertDatabaseHas('product_store_assignments', [
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'store_id' => $store->id,
+            'staff_master_id' => $staff->id,
+            'import_batch_id' => $batch->id,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_upsert_product_store_assignment_updates_existing_assignment(): void
+    {
+        $company = Company::first();
+        $product = Product::factory()->create(['company_id' => $company->id]);
+        $store = Store::factory()->create(['company_id' => $company->id]);
+        $existing = ProductStoreAssignment::factory()->create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'store_id' => $store->id,
+            'staff_master_id' => null,
+            'import_batch_id' => null,
+        ]);
+        $newStaff = StaffMember::factory()->create(['company_id' => $company->id]);
+        $batch = $this->makeImportBatch($company->id);
+        $upserter = new CsvMasterDataUpserter();
+
+        $assignment = $upserter->upsertProductStoreAssignment(
+            $company->id,
+            $product->id,
+            $store->id,
+            $newStaff->id,
+            $batch->id,
+        );
+
+        $this->assertSame($existing->id, $assignment->id);
+        $this->assertDatabaseHas('product_store_assignments', [
+            'id' => $existing->id,
+            'staff_master_id' => $newStaff->id,
+            'import_batch_id' => $batch->id,
+        ]);
+        $this->assertDatabaseCount('product_store_assignments', 1);
+    }
+
+    private function makeImportBatch(int $companyId): CsvImportBatch
+    {
+        return CsvImportBatch::create([
+            'company_id' => $companyId,
+            'file_name' => 'test.csv',
+            'scope' => 'all_stores',
+            'imported_by' => User::first()->id,
+            'imported_at' => now(),
+            'total_rows' => 0,
+            'success_count' => 0,
+            'error_count' => 0,
+        ]);
     }
 }

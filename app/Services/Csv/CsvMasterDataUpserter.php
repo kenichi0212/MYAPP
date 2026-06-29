@@ -2,6 +2,7 @@
 
 namespace App\Services\Csv;
 
+use App\Models\ProductStoreAssignment;
 use App\Models\StaffMember;
 use App\Models\Store;
 use App\Models\StoreGroup;
@@ -61,5 +62,30 @@ class CsvMasterDataUpserter
             'company_id' => $companyId,
             'staff_name' => $staffName,
         ]);
+    }
+
+    /**
+     * (company_id, product_id, store_id)で店舗別商品割当をアップサートする（SPEC.md 10.）。
+     * 取り込まれたバッチのidを付与する。
+     */
+    public function upsertProductStoreAssignment(
+        int $companyId,
+        int $productId,
+        int $storeId,
+        ?int $staffMasterId,
+        int $importBatchId,
+    ): ProductStoreAssignment {
+        $assignment = ProductStoreAssignment::firstOrNew([
+            'company_id' => $companyId,
+            'product_id' => $productId,
+            'store_id' => $storeId,
+        ]);
+
+        $assignment->staff_master_id = $staffMasterId;
+        $assignment->import_batch_id = $importBatchId;
+        $assignment->is_active = true;
+        $assignment->save();
+
+        return $assignment;
     }
 }
