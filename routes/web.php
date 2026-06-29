@@ -45,6 +45,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('users')->name('users.')->grou
 
 Route::middleware(['auth', 'role:admin,hq_staff'])->prefix('csv-imports')->name('csv-imports.')->group(function () {
     Route::get('/create', [CsvImportController::class, 'create'])->name('create');
+    Route::post('/preview', [CsvImportController::class, 'preview'])->name('preview');
+    Route::post('/confirm', [CsvImportController::class, 'confirm'])->name('confirm');
 });
 
 require __DIR__.'/auth.php';

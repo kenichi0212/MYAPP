@@ -8,7 +8,13 @@
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('csv-imports.create') }}" enctype="multipart/form-data" x-data="{ scope: '{{ old('scope', 'all_stores') }}' }">
+                @if (session('status'))
+                    <div class="mb-4 text-sm font-medium text-success">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('csv-imports.preview') }}" enctype="multipart/form-data" x-data="{ scope: '{{ old('scope', 'all_stores') }}' }">
                     @csrf
 
                     <div>

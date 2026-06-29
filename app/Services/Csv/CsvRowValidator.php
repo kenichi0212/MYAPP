@@ -18,6 +18,14 @@ class CsvRowValidator
             $errors[] = '店舗コードが入力されていません';
         }
 
+        if (empty($row['store_name'])) {
+            $errors[] = '店舗名が入力されていません';
+        }
+
+        if (empty($row['product_name'])) {
+            $errors[] = '商品名が入力されていません';
+        }
+
         if (empty($row['jan_code']) && empty($row['internal_product_code'])) {
             $errors[] = 'JANコードまたは自社商品コードのいずれかが必要です';
         } elseif (! empty($row['jan_code']) && ! preg_match('/\A\d{8}\z|\A\d{13}\z/', $row['jan_code'])) {

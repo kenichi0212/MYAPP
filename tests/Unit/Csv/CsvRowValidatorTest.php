@@ -14,6 +14,8 @@ class CsvRowValidatorTest extends TestCase
 
         $errors = $validator->validate([
             'store_code' => 'S001',
+            'store_name' => 'テスト店舗',
+            'product_name' => 'テスト商品',
             'jan_code' => '4912345678904',
         ]);
 
@@ -26,6 +28,8 @@ class CsvRowValidatorTest extends TestCase
 
         $errors = $validator->validate([
             'store_code' => 'S001',
+            'store_name' => 'テスト店舗',
+            'product_name' => 'テスト商品',
             'internal_product_code' => 'P001',
         ]);
 
@@ -37,10 +41,38 @@ class CsvRowValidatorTest extends TestCase
         $validator = new CsvRowValidator();
 
         $errors = $validator->validate([
+            'store_name' => 'テスト店舗',
+            'product_name' => 'テスト商品',
             'jan_code' => '4912345678904',
         ]);
 
         $this->assertContains('店舗コードが入力されていません', $errors);
+    }
+
+    public function test_missing_store_name_is_an_error(): void
+    {
+        $validator = new CsvRowValidator();
+
+        $errors = $validator->validate([
+            'store_code' => 'S001',
+            'product_name' => 'テスト商品',
+            'jan_code' => '4912345678904',
+        ]);
+
+        $this->assertContains('店舗名が入力されていません', $errors);
+    }
+
+    public function test_missing_product_name_is_an_error(): void
+    {
+        $validator = new CsvRowValidator();
+
+        $errors = $validator->validate([
+            'store_code' => 'S001',
+            'store_name' => 'テスト店舗',
+            'jan_code' => '4912345678904',
+        ]);
+
+        $this->assertContains('商品名が入力されていません', $errors);
     }
 
     public function test_missing_both_jan_code_and_internal_product_code_is_an_error(): void
@@ -49,6 +81,8 @@ class CsvRowValidatorTest extends TestCase
 
         $errors = $validator->validate([
             'store_code' => 'S001',
+            'store_name' => 'テスト店舗',
+            'product_name' => 'テスト商品',
         ]);
 
         $this->assertContains('JANコードまたは自社商品コードのいずれかが必要です', $errors);
@@ -61,6 +95,8 @@ class CsvRowValidatorTest extends TestCase
 
         $errors = $validator->validate([
             'store_code' => 'S001',
+            'store_name' => 'テスト店舗',
+            'product_name' => 'テスト商品',
             'jan_code' => $janCode,
         ]);
 
@@ -83,6 +119,8 @@ class CsvRowValidatorTest extends TestCase
 
         $errors = $validator->validate([
             'store_code' => 'S001',
+            'store_name' => 'テスト店舗',
+            'product_name' => 'テスト商品',
             'jan_code' => $janCode,
         ]);
 
@@ -104,7 +142,9 @@ class CsvRowValidatorTest extends TestCase
         $errors = $validator->validate([]);
 
         $this->assertContains('店舗コードが入力されていません', $errors);
+        $this->assertContains('店舗名が入力されていません', $errors);
+        $this->assertContains('商品名が入力されていません', $errors);
         $this->assertContains('JANコードまたは自社商品コードのいずれかが必要です', $errors);
-        $this->assertCount(2, $errors);
+        $this->assertCount(4, $errors);
     }
 }
