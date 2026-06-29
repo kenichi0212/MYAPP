@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Services\OpenFoodFacts\OpenFoodFactsClient;
+use App\Services\ProductLookup\ProductLookupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProductLookupController extends Controller
 {
-    public function __construct(private OpenFoodFactsClient $openFoodFactsClient)
+    public function __construct(private ProductLookupService $productLookupService)
     {
     }
 
@@ -20,38 +19,20 @@ class ProductLookupController extends Controller
             'jan_code' => ['required', 'regex:/\A\d{8}\z|\A\d{13}\z/'],
         ]);
 
-        $janCode = $validated['jan_code'];
+        $result = $this->productLookupService->lookup(auth()->user()->company_id, $validated['jan_code']);
 
-        $product = Product::where('company_id', auth()->user()->company_id)
-            ->where('jan_code', $janCode)
-            ->first();
-
-        if ($product) {
-            return response()->json([
-                'found' => true,
-                'product' => [
-                    'product_name' => $product->product_name,
-                    'maker_name' => $product->maker_name,
-                    'jan_code' => $janCode,
-                    'name_source' => 'master',
-                ],
-            ]);
+        if (! $result['found']) {
+            return response()->json(['found' => false]);
         }
 
-        $apiResult = $this->openFoodFactsClient->lookup($janCode);
-
-        if ($apiResult) {
-            return response()->json([
-                'found' => true,
-                'product' => [
-                    'product_name' => $apiResult['product_name'],
-                    'maker_name' => $apiResult['maker_name'],
-                    'jan_code' => $janCode,
-                    'name_source' => 'api',
-                ],
-            ]);
-        }
-
-        return response()->json(['found' => false]);
+        return response()->json([
+            'found' => true,
+            'product' => [
+                'product_name' => $result['product_name'],
+                'maker_name' => $result['maker_name'],
+                'jan_code' => $result['jan_code'],
+                'name_source' => $result['name_source'],
+            ],
+        ]);
     }
 }

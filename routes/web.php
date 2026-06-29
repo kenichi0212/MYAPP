@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ProductLookupController;
 use App\Http\Controllers\BarcodeScanController;
 use App\Http\Controllers\CsvImportController;
+use App\Http\Controllers\ProductConfirmationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
@@ -42,6 +43,10 @@ Route::middleware('auth')->prefix('barcode-scan')->name('barcode-scan.')->group(
 
 Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/products/lookup', [ProductLookupController::class, 'show'])->name('products.lookup');
+});
+
+Route::middleware('auth')->prefix('products')->name('products.')->group(function () {
+    Route::get('/confirm', [ProductConfirmationController::class, 'show'])->name('confirm');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('users')->name('users.')->group(function () {

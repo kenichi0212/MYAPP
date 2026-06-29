@@ -25,6 +25,7 @@ class BarcodeScanPageTest extends TestCase
             ->assertSee('バーコード読取')
             ->assertSeeHtml('id="scanner-video"')
             ->assertSeeHtml('id="manual-jan-code"')
-            ->assertSee('JANコードを手入力する');
+            ->assertSee('JANコードを手入力する')
+            ->assertSeeHtml('data-confirm-url="'.route('products.confirm').'"');
     }
 }

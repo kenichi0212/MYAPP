@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const manualInput = document.getElementById('manual-jan-code');
     const manualSubmit = document.getElementById('manual-jan-submit');
     const manualError = document.getElementById('manual-jan-error');
+    const proceedLink = document.getElementById('scanner-proceed');
+    const resultWrapper = document.querySelector('[data-scanner-result-wrapper]');
+    const confirmUrl = resultWrapper?.dataset.confirmUrl;
 
     const reader = new BrowserMultiFormatReader();
     let stopped = false;
@@ -39,7 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (resultEl) {
             resultEl.textContent = janCode;
-            resultEl.closest('[data-scanner-result-wrapper]')?.classList.remove('hidden');
+            resultWrapper?.classList.remove('hidden');
+        }
+
+        if (proceedLink && confirmUrl) {
+            proceedLink.href = confirmUrl + '?jan_code=' + encodeURIComponent(janCode);
         }
     };
 
@@ -79,9 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     retryButton?.addEventListener('click', () => {
-        if (resultEl) {
-            resultEl.closest('[data-scanner-result-wrapper]')?.classList.add('hidden');
-        }
+        resultWrapper?.classList.add('hidden');
         startScanning();
     });
 

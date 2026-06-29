@@ -18,11 +18,18 @@
 
                 <p id="scanner-status" class="mt-3 text-sm text-gray-500">カメラを起動しています…</p>
 
-                <div data-scanner-result-wrapper class="mt-4 p-4 bg-success/10 border border-success rounded-md hidden">
+                <div
+                    data-scanner-result-wrapper
+                    data-confirm-url="{{ route('products.confirm') }}"
+                    class="mt-4 p-4 bg-success/10 border border-success rounded-md hidden"
+                >
                     <p class="text-sm text-gray-600">読み取ったJANコード</p>
                     <p id="scanner-result" class="text-lg font-semibold text-gray-900"></p>
                     <input type="hidden" id="scanner-result-input" name="jan_code">
-                    <button type="button" id="scanner-retry" class="mt-3 text-sm text-primary underline">
+                    <a id="scanner-proceed" href="#" class="mt-3 inline-block">
+                        <x-primary-button type="button">この商品で進む</x-primary-button>
+                    </a>
+                    <button type="button" id="scanner-retry" class="mt-3 ms-2 text-sm text-primary underline">
                         再読取する
                     </button>
                 </div>
