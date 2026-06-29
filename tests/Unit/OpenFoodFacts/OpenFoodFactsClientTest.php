@@ -68,4 +68,34 @@ class OpenFoodFactsClientTest extends TestCase
 
         $this->assertNull((new OpenFoodFactsClient())->lookup('4901234567894'));
     }
+
+    public function test_second_lookup_for_same_jan_code_does_not_call_api_again(): void
+    {
+        Http::fake([
+            '*/api/v2/product/4901234567894.json' => Http::response([
+                'status' => 1,
+                'product' => ['product_name' => 'テスト商品', 'brands' => 'テストメーカー'],
+            ]),
+        ]);
+
+        $client = new OpenFoodFactsClient();
+        $client->lookup('4901234567894');
+        $client->lookup('4901234567894');
+
+        Http::assertSentCount(1);
+    }
+
+    public function test_not_found_result_is_also_cached_to_suppress_repeated_calls(): void
+    {
+        Http::fake([
+            '*/api/v2/product/0000000000000.json' => Http::response(['status' => 0]),
+        ]);
+
+        $client = new OpenFoodFactsClient();
+        $client->lookup('0000000000000');
+        $result = $client->lookup('0000000000000');
+
+        $this->assertNull($result);
+        Http::assertSentCount(1);
+    }
 }
