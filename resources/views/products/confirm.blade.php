@@ -30,20 +30,45 @@
 
                 @if (! $found)
                     <p class="text-sm text-danger mb-4">
-                        自社マスタ・外部APIのいずれにも該当する商品情報が見つかりませんでした。手入力してください。
+                        自社マスタ・外部APIのいずれにも該当する商品情報が見つかりませんでした。商品名・メーカー名を手入力してください。
                     </p>
                 @endif
 
-                <dl class="space-y-3">
+                <p class="text-sm text-gray-500 mb-4">
+                    取得した内容は初期値です。必要に応じて修正してから次の入力に進んでください。
+                </p>
+
+                <form id="product-confirm-form" class="space-y-4">
+                    <input type="hidden" name="jan_code" value="{{ $jan_code }}">
+                    <input type="hidden" name="name_source" value="{{ $name_source }}">
+
                     <div>
-                        <dt class="text-sm text-gray-500">商品名</dt>
-                        <dd class="text-base text-gray-900">{{ $product_name ?? '（未取得）' }}</dd>
+                        <label for="product-name-input" class="block text-sm text-gray-600 mb-1">
+                            商品名<span class="text-danger">　*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="product-name-input"
+                            name="product_name"
+                            value="{{ $product_name }}"
+                            required
+                            class="w-full rounded-md border-gray-300 shadow-sm"
+                            placeholder="商品名を入力してください"
+                        >
                     </div>
+
                     <div>
-                        <dt class="text-sm text-gray-500">メーカー名</dt>
-                        <dd class="text-base text-gray-900">{{ $maker_name ?? '（未取得）' }}</dd>
+                        <label for="maker-name-input" class="block text-sm text-gray-600 mb-1">メーカー名</label>
+                        <input
+                            type="text"
+                            id="maker-name-input"
+                            name="maker_name"
+                            value="{{ $maker_name }}"
+                            class="w-full rounded-md border-gray-300 shadow-sm"
+                            placeholder="メーカー名を入力してください（任意）"
+                        >
                     </div>
-                </dl>
+                </form>
 
                 <div class="mt-6 flex items-center justify-between">
                     <a href="{{ route('barcode-scan.create') }}" class="text-sm text-gray-600 underline">

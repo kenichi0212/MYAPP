@@ -32,8 +32,8 @@ class ProductConfirmationPageTest extends TestCase
             ->get('/products/confirm?jan_code=4901234567894')
             ->assertOk()
             ->assertSee('自社マスタ')
-            ->assertSee('テスト商品')
-            ->assertSee('テストメーカー');
+            ->assertSeeHtml('value="テスト商品"')
+            ->assertSeeHtml('value="テストメーカー"');
     }
 
     public function test_shows_api_source_label_when_only_external_api_has_a_match(): void
@@ -51,7 +51,7 @@ class ProductConfirmationPageTest extends TestCase
             ->get('/products/confirm?jan_code=4901234567894')
             ->assertOk()
             ->assertSee('外部API取得')
-            ->assertSee('外部API商品');
+            ->assertSeeHtml('value="外部API商品"');
     }
 
     public function test_shows_manual_label_when_neither_master_nor_api_has_a_match(): void
@@ -66,6 +66,28 @@ class ProductConfirmationPageTest extends TestCase
             ->get('/products/confirm?jan_code=4901234567894')
             ->assertOk()
             ->assertSee('手入力')
-            ->assertSee('見つかりませんでした');
+            ->assertSee('見つかりませんでした')
+            ->assertSeeHtml('id="product-name-input"')
+            ->assertSeeHtml('required');
+    }
+
+    public function test_maker_name_input_has_no_required_attribute(): void
+    {
+        $user = User::factory()->create();
+        Product::factory()->create([
+            'company_id' => $user->company_id,
+            'jan_code' => '4901234567894',
+            'maker_name' => null,
+        ]);
+
+        $content = $this->actingAs($user)
+            ->get('/products/confirm?jan_code=4901234567894')
+            ->assertOk()
+            ->getContent();
+
+        preg_match('/<input[^>]*id="maker-name-input"[^>]*>/', $content, $matches);
+
+        $this->assertNotEmpty($matches);
+        $this->assertStringNotContainsString('required', $matches[0]);
     }
 }
