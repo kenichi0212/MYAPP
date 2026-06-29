@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BarcodeScanController;
 use App\Http\Controllers\CsvImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -32,6 +33,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware('auth')->prefix('barcode-scan')->name('barcode-scan.')->group(function () {
+    Route::get('/', [BarcodeScanController::class, 'create'])->name('create');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('users')->name('users.')->group(function () {
