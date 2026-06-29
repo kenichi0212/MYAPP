@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'open_food_facts' => [
+        'base_url' => env('OPEN_FOOD_FACTS_BASE_URL', 'https://world.openfoodfacts.org'),
+        'timeout' => env('OPEN_FOOD_FACTS_TIMEOUT', 3),
+    ],
+
 ];

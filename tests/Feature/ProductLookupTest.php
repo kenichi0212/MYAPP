@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class ProductLookupTest extends TestCase
@@ -43,8 +44,37 @@ class ProductLookupTest extends TestCase
             ]);
     }
 
-    public function test_returns_not_found_when_jan_code_does_not_exist(): void
+    public function test_falls_back_to_external_api_when_jan_code_does_not_exist_in_master(): void
     {
+        Http::fake([
+            '*/api/v2/product/4901234567894.json' => Http::response([
+                'status' => 1,
+                'product' => ['product_name' => '外部API商品', 'brands' => '外部メーカー'],
+            ]),
+        ]);
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->getJson('/api/products/lookup?jan_code=4901234567894')
+            ->assertOk()
+            ->assertJson([
+                'found' => true,
+                'product' => [
+                    'product_name' => '外部API商品',
+                    'maker_name' => '外部メーカー',
+                    'jan_code' => '4901234567894',
+                    'name_source' => 'api',
+                ],
+            ]);
+    }
+
+    public function test_returns_not_found_when_neither_master_nor_external_api_has_the_jan_code(): void
+    {
+        Http::fake([
+            '*/api/v2/product/4901234567894.json' => Http::response(['status' => 0]),
+        ]);
+
         $user = User::factory()->create();
 
         $this->actingAs($user)
@@ -55,6 +85,10 @@ class ProductLookupTest extends TestCase
 
     public function test_does_not_match_products_belonging_to_another_company(): void
     {
+        Http::fake([
+            '*/api/v2/product/4901234567894.json' => Http::response(['status' => 0]),
+        ]);
+
         $user = User::factory()->create();
         $otherCompany = Company::create(['name' => '他社株式会社']);
         Product::factory()->create([
