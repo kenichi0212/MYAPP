@@ -66,8 +66,8 @@
 - [x] 3-5 `store_groups`／`stores`／`staff_master`のアップサート処理実装
 - [x] 3-6 `products`のマッチング優先順位ロジック実装（SPEC.md 10.1：①自社商品コード→②JANコード→③新規）
 - [x] 3-7 `product_store_assignments`のアップサート処理実装（`import_batch_id`付与）
-- [ ] 3-8 取込結果プレビュー表示→確定の2段階フロー実装
-- [ ] 3-9 `csv_import_batches`／`csv_import_errors`への記録実装
+- [x] 3-8 取込結果プレビュー表示→確定の2段階フロー実装
+- [x] 3-9 `csv_import_batches`／`csv_import_errors`への記録実装（3-8の確定処理に含めて実装済み）
 - [ ] 3-10 CSVインポートのFeatureテスト作成（正常系／必須項目欠落／文字コード混在／優先順位マッチングの分岐網羅）
 
 **DoD**：サンプルCSV（正常系・異常系）を取り込み、SPEC.md 10.の優先順位どおりにマッチングされることをテストで確認。
