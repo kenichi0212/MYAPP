@@ -77,9 +77,13 @@
                             type="date"
                             id="expiry-date-input"
                             name="expiry_date"
+                            min="{{ now()->toDateString() }}"
                             required
                             class="w-full rounded-md border-gray-300 shadow-sm"
                         >
+                        <p id="expiry-date-error" class="mt-1 text-sm text-danger hidden">
+                            賞味期限に過去の日付は登録できません。
+                        </p>
                     </div>
 
                     <div>

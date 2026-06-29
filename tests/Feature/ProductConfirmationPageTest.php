@@ -109,4 +109,20 @@ class ProductConfirmationPageTest extends TestCase
             ->assertSeeHtml('id="is-zero-report-input"')
             ->assertSee('売場に商品が無い');
     }
+
+    public function test_expiry_date_input_disallows_past_dates_via_min_attribute(): void
+    {
+        $user = User::factory()->create();
+        Product::factory()->create([
+            'company_id' => $user->company_id,
+            'jan_code' => '4901234567894',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/products/confirm?jan_code=4901234567894')
+            ->assertOk()
+            ->assertSeeHtml('min="'.now()->toDateString().'"')
+            ->assertSeeHtml('id="expiry-date-error"')
+            ->assertSee('賞味期限に過去の日付は登録できません');
+    }
 }
