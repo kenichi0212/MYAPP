@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CsvImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
@@ -40,6 +41,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('users')->name('users.')->grou
     Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
     Route::put('/{user}', [UserController::class, 'update'])->name('update');
     Route::patch('/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('toggle-active');
+});
+
+Route::middleware(['auth', 'role:admin,hq_staff'])->prefix('csv-imports')->name('csv-imports.')->group(function () {
+    Route::get('/create', [CsvImportController::class, 'create'])->name('create');
 });
 
 require __DIR__.'/auth.php';
