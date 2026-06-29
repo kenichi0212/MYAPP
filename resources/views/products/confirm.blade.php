@@ -68,6 +68,41 @@
                             placeholder="メーカー名を入力してください（任意）"
                         >
                     </div>
+
+                    <div>
+                        <label for="expiry-date-input" class="block text-sm text-gray-600 mb-1">
+                            賞味期限<span class="text-danger">　*</span>
+                        </label>
+                        <input
+                            type="date"
+                            id="expiry-date-input"
+                            name="expiry_date"
+                            required
+                            class="w-full rounded-md border-gray-300 shadow-sm"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" id="is-zero-report-input" name="is_zero_report" value="1" class="rounded border-gray-300">
+                            <span class="text-sm text-gray-700">売場に商品が無い（数量0として登録する）</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label for="quantity-input" class="block text-sm text-gray-600 mb-1">
+                            数量（バラ数）<span class="text-danger">　*</span>
+                        </label>
+                        <input
+                            type="number"
+                            id="quantity-input"
+                            name="quantity"
+                            min="0"
+                            step="1"
+                            required
+                            class="w-32 rounded-md border-gray-300 shadow-sm"
+                        >
+                    </div>
                 </form>
 
                 <div class="mt-6 flex items-center justify-between">
@@ -78,4 +113,8 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        @vite('resources/js/product-confirm.js')
+    @endpush
 </x-app-layout>

@@ -90,4 +90,23 @@ class ProductConfirmationPageTest extends TestCase
         $this->assertNotEmpty($matches);
         $this->assertStringNotContainsString('required', $matches[0]);
     }
+
+    public function test_shows_expiry_date_and_quantity_and_zero_report_fields(): void
+    {
+        $user = User::factory()->create();
+        Product::factory()->create([
+            'company_id' => $user->company_id,
+            'jan_code' => '4901234567894',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/products/confirm?jan_code=4901234567894')
+            ->assertOk()
+            ->assertSeeHtml('id="expiry-date-input"')
+            ->assertSeeHtml('type="date"')
+            ->assertSeeHtml('id="quantity-input"')
+            ->assertSeeHtml('type="number"')
+            ->assertSeeHtml('id="is-zero-report-input"')
+            ->assertSee('売場に商品が無い');
+    }
 }
