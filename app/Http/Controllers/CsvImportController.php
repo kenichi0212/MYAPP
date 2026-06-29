@@ -87,6 +87,7 @@ class CsvImportController extends Controller
             'successCount' => count($validRows),
             'errorCount' => count($errors),
             'errors' => $errors,
+            'validRows' => $validRows,
         ]);
     }
 

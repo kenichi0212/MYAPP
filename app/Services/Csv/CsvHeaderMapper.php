@@ -30,10 +30,12 @@ class CsvHeaderMapper
 
     /**
      * ヘッダー行と1行分のデータから、列順に依存しない論理フィールド名の連想配列を作る。
+     * 空欄のセルはnull（値が無い）として扱う（DB上のNULL許容列・部分一意インデックスとの整合のため、
+     * 空文字列のままにしない）。
      *
      * @param  list<string>  $header
      * @param  list<string>  $row
-     * @return array<string, string>
+     * @return array<string, string|null>
      */
     public function mapRow(array $header, array $row): array
     {
@@ -43,7 +45,7 @@ class CsvHeaderMapper
             $field = self::HEADER_TO_FIELD[$columnName] ?? null;
 
             if ($field !== null && array_key_exists($index, $row)) {
-                $mapped[$field] = $row[$index];
+                $mapped[$field] = $row[$index] !== '' ? $row[$index] : null;
             }
         }
 
