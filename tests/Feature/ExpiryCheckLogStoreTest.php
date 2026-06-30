@@ -251,6 +251,38 @@ class ExpiryCheckLogStoreTest extends TestCase
         ]);
     }
 
+    public function test_zero_report_bypasses_conflict_check_and_inserts_directly(): void
+    {
+        $store = Store::factory()->create();
+        $user = User::factory()->create([
+            'company_id' => $store->company_id,
+            'role' => UserRole::Admin,
+        ]);
+        $payload = [
+            'store_id' => $store->id,
+            'jan_code' => '4901234567894',
+            'product_name' => 'テスト商品',
+            'name_source' => 'manual',
+            'expiry_date' => now()->addMonth()->toDateString(),
+            'quantity' => 3,
+        ];
+
+        $this->actingAs($user)->postJson('/api/check-logs', $payload)->assertCreated();
+
+        // ゼロ登録は重複ダイアログをスキップして直接 INSERT される
+        $this->actingAs($user)->postJson('/api/check-logs', $payload + [
+            'quantity' => 0,
+            'is_zero_report' => true,
+        ])->assertCreated();
+
+        $this->assertDatabaseCount('expiry_check_logs', 2);
+        $this->assertDatabaseHas('expiry_check_logs', [
+            'store_id' => $store->id,
+            'quantity' => 0,
+            'is_zero_report' => true,
+        ]);
+    }
+
     public function test_existing_master_product_is_reused_rather_than_duplicated(): void
     {
         $store = Store::factory()->create();
