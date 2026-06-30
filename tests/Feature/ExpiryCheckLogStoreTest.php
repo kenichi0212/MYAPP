@@ -166,7 +166,7 @@ class ExpiryCheckLogStoreTest extends TestCase
         ]);
     }
 
-    public function test_repeated_registration_for_the_same_lot_appends_rather_than_updates(): void
+    public function test_returns_conflict_on_duplicate_lot_without_quantity_mode(): void
     {
         $store = Store::factory()->create();
         $user = User::factory()->create([
@@ -183,10 +183,72 @@ class ExpiryCheckLogStoreTest extends TestCase
         ];
 
         $this->actingAs($user)->postJson('/api/check-logs', $payload)->assertCreated();
+
+        $this->actingAs($user)->postJson('/api/check-logs', $payload)
+            ->assertStatus(409)
+            ->assertJsonFragment(['conflict' => true, 'existing_quantity' => 3]);
+
+        $this->assertDatabaseCount('expiry_check_logs', 1);
+    }
+
+    public function test_separate_mode_appends_independent_entry_without_summing(): void
+    {
+        $store = Store::factory()->create();
+        $user = User::factory()->create([
+            'company_id' => $store->company_id,
+            'role' => UserRole::Admin,
+        ]);
+        $payload = [
+            'store_id' => $store->id,
+            'jan_code' => '4901234567894',
+            'product_name' => 'テスト商品',
+            'name_source' => 'manual',
+            'expiry_date' => now()->addMonth()->toDateString(),
+            'quantity' => 3,
+        ];
+
         $this->actingAs($user)->postJson('/api/check-logs', $payload)->assertCreated();
+        $this->actingAs($user)->postJson('/api/check-logs', $payload + ['quantity_mode' => 'separate'])
+            ->assertCreated();
 
         $this->assertDatabaseCount('expiry_check_logs', 2);
         $this->assertSame(1, Product::where('jan_code', '4901234567894')->count());
+    }
+
+    public function test_add_mode_inserts_with_summed_quantity(): void
+    {
+        $store = Store::factory()->create();
+        $user = User::factory()->create([
+            'company_id' => $store->company_id,
+            'role' => UserRole::Admin,
+        ]);
+        $expiry = now()->addMonth()->toDateString();
+
+        $this->actingAs($user)->postJson('/api/check-logs', [
+            'store_id' => $store->id,
+            'jan_code' => '4901234567894',
+            'product_name' => 'テスト商品',
+            'name_source' => 'manual',
+            'expiry_date' => $expiry,
+            'quantity' => 3,
+        ])->assertCreated();
+
+        $this->actingAs($user)->postJson('/api/check-logs', [
+            'store_id' => $store->id,
+            'jan_code' => '4901234567894',
+            'product_name' => 'テスト商品',
+            'name_source' => 'manual',
+            'expiry_date' => $expiry,
+            'quantity' => 5,
+            'quantity_mode' => 'add',
+        ])->assertCreated();
+
+        $this->assertDatabaseCount('expiry_check_logs', 2);
+        $this->assertDatabaseHas('expiry_check_logs', [
+            'store_id' => $store->id,
+            'expiry_date' => $expiry,
+            'quantity' => 8,
+        ]);
     }
 
     public function test_existing_master_product_is_reused_rather_than_duplicated(): void

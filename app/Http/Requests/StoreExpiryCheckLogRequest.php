@@ -35,6 +35,7 @@ class StoreExpiryCheckLogRequest extends FormRequest
             'expiry_date' => ['required', 'date', new NotPastExpiryDate()],
             'quantity' => ['required', 'integer', 'min:0'],
             'is_zero_report' => ['boolean'],
+            'quantity_mode' => ['nullable', Rule::in(['add', 'separate'])],
         ];
     }
 }

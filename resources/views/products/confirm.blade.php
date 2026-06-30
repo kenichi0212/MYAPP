@@ -135,6 +135,34 @@
         </div>
     </div>
 
+    {{-- 重複ロット確認ダイアログ --}}
+    <div id="duplicate-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+         aria-modal="true" role="dialog" aria-labelledby="duplicate-dialog-title">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+            <h3 id="duplicate-dialog-title" class="text-base font-semibold text-gray-800 mb-2">重複登録の確認</h3>
+            <p class="text-sm text-gray-600 mb-1">
+                同一ロット（商品・店舗・賞味期限）の登録が既に存在します。
+            </p>
+            <p class="text-sm text-gray-600 mb-4">
+                現在の登録数量：<span id="existing-quantity-display" class="font-semibold text-gray-800"></span>
+            </p>
+            <div class="flex flex-col gap-2">
+                <button id="duplicate-add-btn" type="button"
+                    class="w-full px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:opacity-90">
+                    数量を加算する
+                </button>
+                <button id="duplicate-separate-btn" type="button"
+                    class="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-300">
+                    別履歴として登録する
+                </button>
+                <button id="duplicate-cancel-btn" type="button"
+                    class="text-sm text-gray-500 underline mt-1">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
         @vite('resources/js/product-confirm.js')
     @endpush

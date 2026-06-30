@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const quantityInput = document.getElementById('quantity-input');
     const expiryDateInput = document.getElementById('expiry-date-input');
     const expiryDateError = document.getElementById('expiry-date-error');
+    const form = document.getElementById('product-confirm-form');
+    const feedback = document.getElementById('submit-feedback');
+    const submitButton = document.getElementById('product-confirm-submit');
+    const duplicateDialog = document.getElementById('duplicate-dialog');
+    const existingQuantityDisplay = document.getElementById('existing-quantity-display');
 
     if (zeroReportCheckbox && quantityInput) {
         zeroReportCheckbox.addEventListener('change', () => {
@@ -28,10 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         expiryDateInput.addEventListener('blur', validateExpiryDate);
     }
 
-    const form = document.getElementById('product-confirm-form');
-    const feedback = document.getElementById('submit-feedback');
-    const submitButton = document.getElementById('product-confirm-submit');
-
     if (! form || ! feedback) {
         return;
     }
@@ -42,14 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         feedback.classList.add(...(isError ? ['bg-danger/10', 'text-danger'] : ['bg-success/10', 'text-success']));
     };
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        if (! form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-
+    const buildPayload = (quantityMode = null) => {
         const formData = new FormData(form);
         const payload = {
             store_id: formData.get('store_id'),
@@ -61,32 +55,85 @@ document.addEventListener('DOMContentLoaded', () => {
             quantity: formData.get('quantity'),
             is_zero_report: zeroReportCheckbox?.checked ?? false,
         };
+        if (quantityMode) {
+            payload.quantity_mode = quantityMode;
+        }
+        return payload;
+    };
 
+    const postCheckLog = (payload) =>
+        fetch(form.dataset.submitUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+            },
+            body: JSON.stringify(payload),
+        });
+
+    const showDuplicateDialog = (existingQuantity) => {
+        if (existingQuantityDisplay) {
+            existingQuantityDisplay.textContent = existingQuantity;
+        }
+        duplicateDialog?.classList.remove('hidden');
+    };
+
+    const hideDuplicateDialog = () => {
+        duplicateDialog?.classList.add('hidden');
+    };
+
+    const handleSubmit = async (quantityMode = null) => {
         submitButton?.setAttribute('disabled', 'disabled');
 
         try {
-            const response = await fetch(form.dataset.submitUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
-                },
-                body: JSON.stringify(payload),
-            });
+            const response = await postCheckLog(buildPayload(quantityMode));
+
+            if (response.status === 409) {
+                const body = await response.json().catch(() => ({}));
+                showDuplicateDialog(body.existing_quantity ?? 0);
+                return; // ボタンはダイアログ解決まで無効のまま
+            }
 
             if (response.ok) {
                 showFeedback('登録しました。', false);
                 form.reset();
             } else {
                 const body = await response.json().catch(() => ({}));
-                const message = body.message ?? '登録に失敗しました。入力内容をご確認ください。';
-                showFeedback(message, true);
+                showFeedback(body.message ?? '登録に失敗しました。入力内容をご確認ください。', true);
             }
         } catch (error) {
             showFeedback('通信エラーが発生しました。' + error.message, true);
         } finally {
-            submitButton?.removeAttribute('disabled');
+            if (duplicateDialog?.classList.contains('hidden')) {
+                submitButton?.removeAttribute('disabled');
+            }
         }
+    };
+
+    document.getElementById('duplicate-add-btn')?.addEventListener('click', async () => {
+        hideDuplicateDialog();
+        await handleSubmit('add');
+    });
+
+    document.getElementById('duplicate-separate-btn')?.addEventListener('click', async () => {
+        hideDuplicateDialog();
+        await handleSubmit('separate');
+    });
+
+    document.getElementById('duplicate-cancel-btn')?.addEventListener('click', () => {
+        hideDuplicateDialog();
+        submitButton?.removeAttribute('disabled');
+    });
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (! form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        await handleSubmit();
     });
 });

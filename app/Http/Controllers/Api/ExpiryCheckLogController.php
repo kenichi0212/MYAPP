@@ -29,12 +29,34 @@ class ExpiryCheckLogController extends Controller
             $validated['name_source'],
         );
 
+        $quantityMode = $validated['quantity_mode'] ?? null;
+
+        $existingLog = ExpiryCheckLog::where('company_id', $companyId)
+            ->where('product_id', $product->id)
+            ->where('store_id', $validated['store_id'])
+            ->where('expiry_date', $validated['expiry_date'])
+            ->latest('checked_at')
+            ->first();
+
+        if ($existingLog && $quantityMode === null && ! $isZeroReport) {
+            return response()->json([
+                'conflict' => true,
+                'existing_quantity' => $existingLog->quantity,
+            ], 409);
+        }
+
+        $quantity = $isZeroReport ? 0 : (int) $validated['quantity'];
+
+        if (! $isZeroReport && $existingLog && $quantityMode === 'add') {
+            $quantity = $existingLog->quantity + (int) $validated['quantity'];
+        }
+
         $checkLog = ExpiryCheckLog::create([
             'company_id' => $companyId,
             'product_id' => $product->id,
             'store_id' => $validated['store_id'],
             'expiry_date' => $validated['expiry_date'],
-            'quantity' => $isZeroReport ? 0 : $validated['quantity'],
+            'quantity' => $quantity,
             'is_zero_report' => $isZeroReport,
             'data_source' => $validated['name_source'],
             'checked_by' => $request->user()->id,
