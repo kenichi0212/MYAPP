@@ -20,6 +20,10 @@
                         バーコード読取
                     </x-nav-link>
 
+                    <x-nav-link :href="route('check-logs.index')" :active="request()->routeIs('check-logs.*')">
+                        商品一覧
+                    </x-nav-link>
+
                     @if (auth()->user()->isAdmin())
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                             ユーザー管理

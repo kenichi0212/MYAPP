@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\CheckLogIndexController;
 use App\Http\Controllers\Api\ExpiryCheckLogController;
 use App\Http\Controllers\Api\ProductLookupController;
+use App\Http\Controllers\Api\UncheckedAlertController;
+use App\Http\Controllers\CheckLogListController;
 use App\Http\Controllers\BarcodeScanController;
 use App\Http\Controllers\CsvImportController;
 use App\Http\Controllers\ProductConfirmationController;
@@ -44,7 +47,13 @@ Route::middleware('auth')->prefix('barcode-scan')->name('barcode-scan.')->group(
 
 Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/products/lookup', [ProductLookupController::class, 'show'])->name('products.lookup');
+    Route::get('/check-logs', [CheckLogIndexController::class, 'index'])->name('check-logs.index');
     Route::post('/check-logs', [ExpiryCheckLogController::class, 'store'])->name('check-logs.store');
+    Route::get('/alerts/uncheck', [UncheckedAlertController::class, 'index'])->name('alerts.uncheck');
+});
+
+Route::middleware('auth')->prefix('check-logs')->name('check-logs.')->group(function () {
+    Route::get('/', [CheckLogListController::class, 'index'])->name('index');
 });
 
 Route::middleware('auth')->prefix('products')->name('products.')->group(function () {
