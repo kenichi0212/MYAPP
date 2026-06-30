@@ -251,6 +251,32 @@ class ExpiryCheckLogStoreTest extends TestCase
         ]);
     }
 
+    public function test_checked_by_checked_at_and_store_id_are_auto_assigned_from_server(): void
+    {
+        $store = Store::factory()->create();
+        $user = User::factory()->create([
+            'company_id' => $store->company_id,
+            'role' => UserRole::Admin,
+        ]);
+        $now = now()->startOfSecond();
+
+        $this->travelTo($now, function () use ($store, $user) {
+            $this->actingAs($user)->postJson('/api/check-logs', [
+                'store_id' => $store->id,
+                'jan_code' => '4901234567894',
+                'product_name' => 'テスト商品',
+                'name_source' => 'manual',
+                'expiry_date' => now()->addMonth()->toDateString(),
+                'quantity' => 2,
+            ])->assertCreated();
+        });
+
+        $log = ExpiryCheckLog::first();
+        $this->assertSame($user->id, $log->checked_by);
+        $this->assertSame($store->id, $log->store_id);
+        $this->assertTrue($now->equalTo($log->checked_at));
+    }
+
     public function test_zero_report_bypasses_conflict_check_and_inserts_directly(): void
     {
         $store = Store::factory()->create();
