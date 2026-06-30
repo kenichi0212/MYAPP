@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Models\Product;
+use App\Models\Store;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -124,5 +126,57 @@ class ProductConfirmationPageTest extends TestCase
             ->assertSeeHtml('min="'.now()->toDateString().'"')
             ->assertSeeHtml('id="expiry-date-error"')
             ->assertSee('賞味期限に過去の日付は登録できません');
+    }
+
+    public function test_store_dropdown_is_displayed(): void
+    {
+        $user = User::factory()->create();
+        Product::factory()->create([
+            'company_id' => $user->company_id,
+            'jan_code' => '4901234567894',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/products/confirm?jan_code=4901234567894')
+            ->assertOk()
+            ->assertSeeHtml('id="store-id-input"')
+            ->assertSeeHtml('name="store_id"');
+    }
+
+    public function test_store_staff_sees_only_their_assigned_store(): void
+    {
+        $myStore = Store::factory()->create(['store_name' => '自店舗店']);
+        $otherStore = Store::factory()->create(['store_name' => '他店舗店']);
+        $user = User::factory()->create([
+            'role' => UserRole::StoreStaff,
+            'store_id' => $myStore->id,
+        ]);
+        Product::factory()->create([
+            'company_id' => $user->company_id,
+            'jan_code' => '4901234567894',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/products/confirm?jan_code=4901234567894')
+            ->assertOk()
+            ->assertSee($myStore->store_name)
+            ->assertDontSee($otherStore->store_name);
+    }
+
+    public function test_hq_staff_sees_all_company_stores(): void
+    {
+        $store1 = Store::factory()->create(['store_name' => '本社管轄店A']);
+        $store2 = Store::factory()->create(['store_name' => '本社管轄店B']);
+        $user = User::factory()->create(['role' => UserRole::HqStaff]);
+        Product::factory()->create([
+            'company_id' => $user->company_id,
+            'jan_code' => '4901234567894',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/products/confirm?jan_code=4901234567894')
+            ->assertOk()
+            ->assertSee($store1->store_name)
+            ->assertSee($store2->store_name);
     }
 }

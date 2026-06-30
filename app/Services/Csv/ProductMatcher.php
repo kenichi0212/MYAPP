@@ -16,16 +16,23 @@ class ProductMatcher
         ?string $janCode,
         string $productName,
         ?string $makerName,
+        string $nameSourceForNewProduct = 'master',
     ): Product {
         $product = $this->findByInternalProductCode($companyId, $internalProductCode)
             ?? $this->findByJanCode($companyId, $janCode);
 
-        $product ??= new Product(['company_id' => $companyId, 'name_source' => 'master']);
+        $isNewProduct = $product === null;
+        $product ??= new Product(['company_id' => $companyId]);
 
         $product->internal_product_code = $internalProductCode;
         $product->jan_code = $janCode;
         $product->product_name = $productName;
         $product->maker_name = $makerName;
+
+        if ($isNewProduct) {
+            $product->name_source = $nameSourceForNewProduct;
+        }
+
         $product->save();
 
         return $product;

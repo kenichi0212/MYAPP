@@ -38,9 +38,22 @@
                     取得した内容は初期値です。必要に応じて修正してから次の入力に進んでください。
                 </p>
 
-                <form id="product-confirm-form" class="space-y-4">
+                <div id="submit-feedback" class="hidden mb-4 p-3 rounded-md text-sm"></div>
+
+                <form id="product-confirm-form" class="space-y-4" data-submit-url="{{ route('api.check-logs.store') }}">
                     <input type="hidden" name="jan_code" value="{{ $jan_code }}">
                     <input type="hidden" name="name_source" value="{{ $name_source }}">
+
+                    <div>
+                        <label for="store-id-input" class="block text-sm text-gray-600 mb-1">
+                            店舗<span class="text-danger">　*</span>
+                        </label>
+                        <select id="store-id-input" name="store_id" required class="w-full rounded-md border-gray-300 shadow-sm">
+                            @foreach ($stores as $store)
+                                <option value="{{ $store->id }}">{{ $store->store_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div>
                         <label for="product-name-input" class="block text-sm text-gray-600 mb-1">
@@ -106,6 +119,10 @@
                             required
                             class="w-32 rounded-md border-gray-300 shadow-sm"
                         >
+                    </div>
+
+                    <div>
+                        <x-primary-button type="submit" id="product-confirm-submit">登録する</x-primary-button>
                     </div>
                 </form>
 

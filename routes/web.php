@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ExpiryCheckLogController;
 use App\Http\Controllers\Api\ProductLookupController;
 use App\Http\Controllers\BarcodeScanController;
 use App\Http\Controllers\CsvImportController;
@@ -43,6 +44,7 @@ Route::middleware('auth')->prefix('barcode-scan')->name('barcode-scan.')->group(
 
 Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/products/lookup', [ProductLookupController::class, 'show'])->name('products.lookup');
+    Route::post('/check-logs', [ExpiryCheckLogController::class, 'store'])->name('check-logs.store');
 });
 
 Route::middleware('auth')->prefix('products')->name('products.')->group(function () {
