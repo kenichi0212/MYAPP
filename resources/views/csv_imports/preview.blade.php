@@ -28,48 +28,52 @@
                 @if ($successCount > 0)
                     <div class="mt-6">
                         <h3 class="font-semibold text-gray-800 mb-2">取込対象（成功分）</h3>
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-gray-200 text-gray-500">
-                                    <th class="py-2">商品名</th>
-                                    <th class="py-2">店舗コード</th>
-                                    <th class="py-2">店舗名</th>
-                                    <th class="py-2">JANコード</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($validRows as $row)
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-2">{{ $row['product_name'] }}</td>
-                                        <td class="py-2">{{ $row['store_code'] }}</td>
-                                        <td class="py-2">{{ $row['store_name'] }}</td>
-                                        <td class="py-2">{{ $row['jan_code'] ?? '-' }}</td>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-200 text-gray-500">
+                                        <th class="py-2 pr-4 whitespace-nowrap">商品名</th>
+                                        <th class="py-2 pr-4 whitespace-nowrap">店舗コード</th>
+                                        <th class="py-2 pr-4 whitespace-nowrap">店舗名</th>
+                                        <th class="py-2 whitespace-nowrap">JANコード</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach ($validRows as $row)
+                                        <tr class="border-b border-gray-100">
+                                            <td class="py-2 pr-4">{{ $row['product_name'] }}</td>
+                                            <td class="py-2 pr-4">{{ $row['store_code'] }}</td>
+                                            <td class="py-2 pr-4">{{ $row['store_name'] }}</td>
+                                            <td class="py-2">{{ $row['jan_code'] ?? '-' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 @endif
 
                 @if ($errorCount > 0)
                     <div class="mt-6">
                         <h3 class="font-semibold text-gray-800 mb-2">エラー内容</h3>
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-gray-200 text-gray-500">
-                                    <th class="py-2">行番号</th>
-                                    <th class="py-2">エラー内容</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($errors as $error)
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-2">{{ $error['row_number'] }}</td>
-                                        <td class="py-2 text-danger">{{ $error['reason'] }}</td>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-200 text-gray-500">
+                                        <th class="py-2 pr-4 whitespace-nowrap">行番号</th>
+                                        <th class="py-2 whitespace-nowrap">エラー内容</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach ($errors as $error)
+                                        <tr class="border-b border-gray-100">
+                                            <td class="py-2 pr-4">{{ $error['row_number'] }}</td>
+                                            <td class="py-2 text-danger">{{ $error['reason'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 @endif
 

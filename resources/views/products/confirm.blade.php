@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-12">
+        <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <div class="flex items-center justify-between mb-4">
                     <p class="text-sm text-gray-600">JANコード：{{ $jan_code }}</p>
@@ -119,7 +119,7 @@
                             min="0"
                             step="1"
                             required
-                            class="w-32 rounded-md border-gray-300 shadow-sm"
+                            class="w-full sm:w-32 rounded-md border-gray-300 shadow-sm"
                         >
                     </div>
 

@@ -69,14 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (error && ! (error instanceof NotFoundException)) {
-                        setStatus('読み取り中にエラーが発生しました: ' + error.message);
+                        setStatus('読み取り中にエラーが発生しました。再読取するか、JANコードを手入力してください。');
                     } else {
                         setStatus('バーコードをカメラに近づけてください。');
                     }
                 }
             )
-            .catch((error) => {
-                setStatus('カメラを利用できませんでした。カメラへのアクセスを許可するか、JANコードを手入力してください。（' + error.message + '）');
+            .catch(() => {
+                setStatus('カメラを利用できませんでした。カメラへのアクセスを許可するか、JANコードを手入力してください。');
                 showManualForm();
             });
     };

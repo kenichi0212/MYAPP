@@ -153,8 +153,36 @@ return [
     'uuid' => ':attributeには、有効なUUIDを指定してください。',
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'jan_code' => [
+            'required' => 'JANコードを入力してください。',
+            'regex' => 'JANコードは8桁または13桁の数字で入力してください。',
+        ],
+        'expiry_date' => [
+            'required' => '賞味期限を入力してください。',
+            'date' => '賞味期限は正しい日付形式で入力してください。',
+        ],
+        'store_id' => [
+            'required' => '店舗を選択してください。',
+            'exists' => '選択された店舗が存在しないか、権限がありません。',
+        ],
+        'product_name' => [
+            'required' => '商品名を入力してください。',
+        ],
+        'quantity' => [
+            'required' => '数量を入力してください。',
+            'integer' => '数量は整数で入力してください。',
+            'min' => '数量は0以上の値を入力してください。',
+        ],
+        'store_group_id' => [
+            'required_if' => '取込範囲に「店舗グループ単位」を選択した場合は、対象グループを選択してください。',
+            'exists' => '選択された店舗グループが存在しないか、権限がありません。',
+        ],
+        'role' => [
+            'required' => '役割を選択してください。',
+        ],
+        'file' => [
+            'required' => 'CSVファイルを選択してください。',
+            'file' => 'CSVファイルのアップロードに失敗しました。',
         ],
     ],
 
@@ -164,6 +192,18 @@ return [
         'password' => 'パスワード',
         'password_confirmation' => 'パスワード（確認）',
         'current_password' => '現在のパスワード',
+        'jan_code' => 'JANコード',
+        'product_name' => '商品名',
+        'maker_name' => 'メーカー名',
+        'expiry_date' => '賞味期限',
+        'quantity' => '数量',
+        'store_id' => '店舗',
+        'store_group_id' => '店舗グループ',
+        'role' => '役割',
+        'scope' => '取込範囲',
+        'file' => 'CSVファイル',
+        'name_source' => '情報取得元',
+        'staff_master_id' => '担当者',
     ],
 
 ];

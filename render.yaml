@@ -46,3 +46,5 @@ services:
         value: stack
       - key: BCRYPT_ROUNDS
         value: "12"
+      - key: LOG_LEVEL
+        value: error

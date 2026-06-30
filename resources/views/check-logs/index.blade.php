@@ -8,11 +8,11 @@
 
             {{-- フィルタフォーム --}}
             <form method="GET" action="{{ route('check-logs.index') }}"
-                  class="bg-white shadow-sm rounded-lg p-4 mb-6 flex flex-wrap gap-3 items-end">
+                  class="bg-white shadow-sm rounded-lg p-4 mb-6 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-3 items-end">
 
                 <div>
                     <label class="block text-xs text-gray-500 mb-1">店舗</label>
-                    <select name="store_id" class="rounded-md border-gray-300 shadow-sm text-sm">
+                    <select name="store_id" class="w-full sm:w-auto rounded-md border-gray-300 shadow-sm text-sm min-h-[44px]">
                         <option value="">すべての店舗</option>
                         @foreach ($stores as $store)
                             <option value="{{ $store->id }}" @selected(request('store_id') == $store->id)>
@@ -24,7 +24,7 @@
 
                 <div>
                     <label class="block text-xs text-gray-500 mb-1">担当者</label>
-                    <select name="checked_by" class="rounded-md border-gray-300 shadow-sm text-sm">
+                    <select name="checked_by" class="w-full sm:w-auto rounded-md border-gray-300 shadow-sm text-sm min-h-[44px]">
                         <option value="">すべての担当者</option>
                         @foreach ($checkers as $checker)
                             <option value="{{ $checker->id }}" @selected(request('checked_by') == $checker->id)>
@@ -36,7 +36,7 @@
 
                 <div>
                     <label class="block text-xs text-gray-500 mb-1">賞味期限</label>
-                    <select name="expiry_within" class="rounded-md border-gray-300 shadow-sm text-sm">
+                    <select name="expiry_within" class="w-full sm:w-auto rounded-md border-gray-300 shadow-sm text-sm min-h-[44px]">
                         <option value="">期限を絞らない</option>
                         <option value="1"  @selected(request('expiry_within') == '1')>1ヶ月未満</option>
                         <option value="2"  @selected(request('expiry_within') == '2')>2ヶ月未満</option>
@@ -45,17 +45,17 @@
                     </select>
                 </div>
 
-                <div class="flex items-center gap-1 pb-1">
+                <div class="flex items-center gap-1 min-h-[44px]">
                     <input type="checkbox" id="needs_attention_only" name="needs_attention_only" value="1"
                            @checked(request('needs_attention_only'))
-                           class="rounded border-gray-300 text-danger">
+                           class="rounded border-gray-300 text-danger w-5 h-5">
                     <label for="needs_attention_only" class="text-sm text-gray-700">要確認のみ</label>
                 </div>
 
-                <div class="flex gap-2">
+                <div class="flex gap-2 col-span-full lg:col-auto">
                     <x-primary-button type="submit">絞り込む</x-primary-button>
                     <a href="{{ route('check-logs.index') }}"
-                       class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">
+                       class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 flex items-center">
                         リセット
                     </a>
                 </div>

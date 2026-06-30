@@ -103,8 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const body = await response.json().catch(() => ({}));
                 showFeedback(body.message ?? '登録に失敗しました。入力内容をご確認ください。', true);
             }
-        } catch (error) {
-            showFeedback('通信エラーが発生しました。' + error.message, true);
+        } catch {
+            showFeedback('通信エラーが発生しました。しばらく時間をおいて再度お試しください。', true);
         } finally {
             if (duplicateDialog?.classList.contains('hidden')) {
                 submitButton?.removeAttribute('disabled');

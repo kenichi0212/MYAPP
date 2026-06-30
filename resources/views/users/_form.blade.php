@@ -24,6 +24,7 @@
 <div class="mt-4">
     <x-input-label for="password_confirmation" value="パスワード（確認）" />
     <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" :required="! $user" />
+    <x-input-error class="mt-2" :messages="$errors->get('password_confirmation')" />
 </div>
 
 <div class="mt-4">
