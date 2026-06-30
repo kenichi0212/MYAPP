@@ -40,7 +40,9 @@
 
                 <div id="submit-feedback" class="hidden mb-4 p-3 rounded-md text-sm"></div>
 
-                <form id="product-confirm-form" class="space-y-4" data-submit-url="{{ route('api.check-logs.store') }}">
+                <form id="product-confirm-form" class="space-y-4"
+      data-submit-url="{{ route('api.check-logs.store') }}"
+      data-redirect-url="{{ route('barcode-scan.create') }}">
                     <input type="hidden" name="jan_code" value="{{ $jan_code }}">
                     <input type="hidden" name="name_source" value="{{ $name_source }}">
 

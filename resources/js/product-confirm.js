@@ -96,8 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (response.ok) {
-                showFeedback('登録しました。', false);
-                form.reset();
+                showFeedback('登録しました。次の商品をスキャンしてください。', false);
+                const redirectUrl = form.dataset.redirectUrl ?? '/barcode-scan';
+                setTimeout(() => { window.location.href = redirectUrl; }, 1500);
             } else {
                 const body = await response.json().catch(() => ({}));
                 showFeedback(body.message ?? '登録に失敗しました。入力内容をご確認ください。', true);
