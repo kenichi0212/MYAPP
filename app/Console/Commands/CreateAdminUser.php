@@ -14,8 +14,8 @@ class CreateAdminUser extends Command
 
     public function handle(): int
     {
-        $email    = env('ADMIN_EMAIL');
-        $password = env('ADMIN_PASSWORD');
+        $email    = getenv('ADMIN_EMAIL');
+        $password = getenv('ADMIN_PASSWORD');
 
         if (! $email || ! $password) {
             $this->info('ADMIN_EMAIL / ADMIN_PASSWORD が未設定のためスキップします。');

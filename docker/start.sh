@@ -7,7 +7,7 @@ php artisan view:cache
 php artisan migrate --force
 
 # 企業レコードを初回のみ作成
-php artisan db:seed --class=CompanySeeder
+php artisan db:seed --class=CompanySeeder --force
 
 # 管理者ユーザーを環境変数から初回のみ作成
 php artisan app:create-admin
