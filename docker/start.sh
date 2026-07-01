@@ -15,11 +15,11 @@ if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
         \$company = \App\Models\Company::first();
         if (\$company) {
             \App\Models\User::firstOrCreate(
-                ['email' => env('ADMIN_EMAIL')],
+                ['email' => '$ADMIN_EMAIL'],
                 [
                     'company_id' => \$company->id,
                     'name'       => '管理者',
-                    'password'   => bcrypt(env('ADMIN_PASSWORD')),
+                    'password'   => bcrypt('$ADMIN_PASSWORD'),
                     'role'       => \App\Enums\UserRole::Admin,
                     'is_active'  => true,
                 ]
