@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\CheckLogIndexController;
+use App\Http\Controllers\Api\DisposalLogController;
 use App\Http\Controllers\Api\ExpiryCheckLogController;
+use App\Http\Controllers\Api\ProcessCheckLogController;
 use App\Http\Controllers\Api\ProductLookupController;
 use App\Http\Controllers\Api\UncheckedAlertController;
 use App\Http\Controllers\CheckLogListController;
@@ -50,6 +52,8 @@ Route::middleware('auth')->prefix('api')->name('api.')->group(function () {
     Route::get('/products/lookup', [ProductLookupController::class, 'show'])->name('products.lookup');
     Route::get('/check-logs', [CheckLogIndexController::class, 'index'])->name('check-logs.index');
     Route::post('/check-logs', [ExpiryCheckLogController::class, 'store'])->name('check-logs.store');
+    Route::patch('/check-logs/{log}/process', ProcessCheckLogController::class)->name('check-logs.process');
+    Route::post('/check-logs/{log}/dispose', [DisposalLogController::class, 'store'])->name('check-logs.dispose');
     Route::get('/alerts/uncheck', [UncheckedAlertController::class, 'index'])->name('alerts.uncheck');
 });
 

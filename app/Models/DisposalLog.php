@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\ProcessType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ExpiryCheckLog extends Model
+class DisposalLog extends Model
 {
-    use HasFactory;
-
-    const CREATED_AT = null;
     const UPDATED_AT = null;
 
     protected $fillable = [
@@ -18,22 +15,18 @@ class ExpiryCheckLog extends Model
         'product_id',
         'store_id',
         'expiry_date',
+        'process_type',
         'quantity',
-        'is_zero_report',
-        'data_source',
-        'checked_by',
-        'checked_at',
-        'note',
-        'processed_at',
         'processed_by',
+        'processed_at',
+        'note',
     ];
 
     protected function casts(): array
     {
         return [
-            'expiry_date' => 'date',
-            'is_zero_report' => 'boolean',
-            'checked_at' => 'datetime',
+            'expiry_date'  => 'date',
+            'process_type' => ProcessType::class,
             'processed_at' => 'datetime',
         ];
     }
@@ -53,8 +46,8 @@ class ExpiryCheckLog extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function checkedBy(): BelongsTo
+    public function processedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'checked_by');
+        return $this->belongsTo(User::class, 'processed_by');
     }
 }

@@ -19,6 +19,7 @@ services:
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
+            - 'sail-storage:/var/www/html/storage'
         networks:
             - sail
         depends_on:
@@ -53,4 +54,6 @@ networks:
         driver: bridge
 volumes:
     sail-pgsql:
+        driver: local
+    sail-storage:
         driver: local

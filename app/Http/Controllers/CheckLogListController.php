@@ -19,10 +19,15 @@ class CheckLogListController extends Controller
         $user = $request->user();
         $companyId = $user->company_id;
 
-        $query = $this->service->currentStateQuery($companyId);
+        $includeProcessed = $request->boolean('show_processed');
+        $query = $this->service->currentStateQuery($companyId, $includeProcessed);
 
         if ($storeId = $request->integer('store_id') ?: null) {
             $query->where('expiry_check_logs.store_id', $storeId);
+        }
+
+        if ($officeName = $request->input('office_name')) {
+            $query->whereHas('store', fn ($q) => $q->where('office_name', $officeName));
         }
 
         if ($checkedBy = $request->integer('checked_by') ?: null) {
@@ -46,8 +51,13 @@ class CheckLogListController extends Controller
         );
 
         $stores = Store::where('company_id', $companyId)->orderBy('store_name')->get();
+        $officeNames = Store::where('company_id', $companyId)
+            ->whereNotNull('office_name')
+            ->distinct()
+            ->orderBy('office_name')
+            ->pluck('office_name');
         $checkers = User::where('company_id', $companyId)->orderBy('name')->get();
 
-        return view('check-logs.index', compact('logs', 'stores', 'checkers'));
+        return view('check-logs.index', compact('logs', 'stores', 'officeNames', 'checkers'));
     }
 }

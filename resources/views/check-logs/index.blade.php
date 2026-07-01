@@ -11,6 +11,18 @@
                   class="bg-white shadow-sm rounded-lg p-4 mb-6 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-3 items-end">
 
                 <div>
+                    <label class="block text-xs text-gray-500 mb-1">事業所</label>
+                    <select name="office_name" class="w-full sm:w-auto rounded-md border-gray-300 shadow-sm text-sm min-h-[44px]">
+                        <option value="">すべての事業所</option>
+                        @foreach ($officeNames as $officeName)
+                            <option value="{{ $officeName }}" @selected(request('office_name') === $officeName)>
+                                {{ $officeName }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
                     <label class="block text-xs text-gray-500 mb-1">店舗</label>
                     <select name="store_id" class="w-full sm:w-auto rounded-md border-gray-300 shadow-sm text-sm min-h-[44px]">
                         <option value="">すべての店舗</option>
@@ -52,6 +64,13 @@
                     <label for="needs_attention_only" class="text-sm text-gray-700">要確認のみ</label>
                 </div>
 
+                <div class="flex items-center gap-1 min-h-[44px]">
+                    <input type="checkbox" id="show_processed" name="show_processed" value="1"
+                           @checked(request('show_processed'))
+                           class="rounded border-gray-300 text-primary w-5 h-5">
+                    <label for="show_processed" class="text-sm text-gray-700">処理済みを含む</label>
+                </div>
+
                 <div class="flex gap-2 col-span-full lg:col-auto">
                     <x-primary-button type="submit">絞り込む</x-primary-button>
                     <a href="{{ route('check-logs.index') }}"
@@ -79,6 +98,7 @@
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">担当者</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">登録日時</th>
                             <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">状態</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">処理</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -129,7 +149,11 @@
                                     {{ $log->checked_at->format('Y/m/d H:i') }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    @if ($log->needs_attention)
+                                    @if ($log->processed_at)
+                                        <span class="inline-block px-2 py-0.5 text-xs font-semibold bg-gray-100 text-gray-500 rounded-full">
+                                            処理済み
+                                        </span>
+                                    @elseif ($log->needs_attention)
                                         <span class="inline-block px-2 py-0.5 text-xs font-semibold bg-danger/10 text-danger rounded-full">
                                             要確認
                                         </span>
@@ -137,10 +161,23 @@
                                         <span class="text-gray-300 text-xs">—</span>
                                     @endif
                                 </td>
+                                <td class="px-4 py-3 text-center">
+                                    @if (! $log->processed_at)
+                                        <button type="button"
+                                            data-log-id="{{ $log->id }}"
+                                            data-dispose-url="{{ route('api.check-logs.dispose', $log) }}"
+                                            data-process-url="{{ route('api.check-logs.process', $log) }}"
+                                            class="dispose-btn text-xs text-gray-500 underline hover:text-danger">
+                                            処理する
+                                        </button>
+                                    @else
+                                        <span class="text-xs text-gray-300">{{ $log->processed_at->format('m/d') }}</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center text-gray-400">
+                                <td colspan="9" class="px-4 py-8 text-center text-gray-400">
                                     登録データがありません
                                 </td>
                             </tr>
@@ -158,4 +195,106 @@
 
         </div>
     </div>
+
+    {{-- 処分登録モーダル --}}
+    <div id="dispose-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm mx-4 p-6">
+            <h3 class="text-base font-semibold text-gray-800 mb-4">処理内容を登録</h3>
+            <div class="mb-3">
+                <label class="block text-xs text-gray-500 mb-1">処理種別 <span class="text-danger">*</span></label>
+                <select id="modal-process-type" class="w-full rounded-md border-gray-300 shadow-sm text-sm">
+                    <option value="">選択してください</option>
+                    <option value="disposal">廃棄</option>
+                    <option value="discount">値引き</option>
+                    <option value="return">返品</option>
+                    <option value="other">その他（売り切れ等）</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="block text-xs text-gray-500 mb-1">処理数量 <span class="text-danger">*</span></label>
+                <input id="modal-quantity" type="number" min="1" class="w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="例：5">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs text-gray-500 mb-1">備考（任意）</label>
+                <input id="modal-note" type="text" maxlength="500" class="w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="例：2026/07/01 廃棄処分">
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button id="modal-cancel" type="button"
+                    class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">
+                    キャンセル
+                </button>
+                <button id="modal-submit" type="button"
+                    class="px-4 py-2 text-sm text-white bg-danger rounded-md hover:bg-danger/80">
+                    登録する
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+    const modal      = document.getElementById('dispose-modal');
+    const typeSelect = document.getElementById('modal-process-type');
+    const qtyInput   = document.getElementById('modal-quantity');
+    const noteInput  = document.getElementById('modal-note');
+    const cancelBtn  = document.getElementById('modal-cancel');
+    const submitBtn  = document.getElementById('modal-submit');
+    const csrf       = document.querySelector('meta[name="csrf-token"]').content;
+
+    let currentBtn = null;
+
+    document.querySelectorAll('.dispose-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentBtn = btn;
+            typeSelect.value = '';
+            qtyInput.value = '';
+            noteInput.value = '';
+            modal.classList.remove('hidden');
+        });
+    });
+
+    cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
+
+    submitBtn.addEventListener('click', async () => {
+        if (! typeSelect.value) { alert('処理種別を選択してください。'); return; }
+        if (! qtyInput.value || Number(qtyInput.value) < 1) { alert('処理数量を1以上で入力してください。'); return; }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = '登録中…';
+
+        try {
+            const res = await fetch(currentBtn.dataset.disposeUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrf,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    process_type: typeSelect.value,
+                    quantity: Number(qtyInput.value),
+                    note: noteInput.value || null,
+                }),
+            });
+
+            if (res.ok) {
+                modal.classList.add('hidden');
+                const row = currentBtn.closest('tr');
+                row.style.transition = 'opacity 0.4s';
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 400);
+            } else {
+                const body = await res.json().catch(() => ({}));
+                alert(body.message ?? '登録に失敗しました。再度お試しください。');
+            }
+        } catch {
+            alert('通信エラーが発生しました。');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '登録する';
+        }
+    });
+    </script>
+    @endpush
 </x-app-layout>
