@@ -49,6 +49,13 @@
 
                     <div class="relative bg-black rounded-md overflow-hidden aspect-video">
                         <video id="scanner-video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+                        <div id="camera-error-overlay" class="hidden absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gray-900/95 text-white px-4 text-center">
+                            <p id="camera-error-msg" class="text-sm"></p>
+                            <button type="button" id="camera-retry-btn"
+                                class="px-4 py-2 text-sm bg-primary rounded-md hover:opacity-90">
+                                カメラを再起動する
+                            </button>
+                        </div>
                     </div>
 
                     <p id="scanner-status" class="mt-3 text-sm text-gray-500">カメラを起動しています…</p>

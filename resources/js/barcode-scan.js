@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const storeNameInput       = document.getElementById('store-name-input');
     const storeNameError       = document.getElementById('store-name-error');
     const storeMap             = window.__storeMap ?? {};
+    const cameraErrorOverlay   = document.getElementById('camera-error-overlay');
+    const cameraErrorMsg       = document.getElementById('camera-error-msg');
+    const cameraRetryBtn       = document.getElementById('camera-retry-btn');
 
     // --- 重複ダイアログ ---
     const duplicateDialog          = document.getElementById('duplicate-dialog');
@@ -87,10 +90,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── スキャナー ───────────────────────────────────────────────
 
+    const showCameraError = (msg) => {
+        if (cameraErrorMsg)  cameraErrorMsg.textContent = msg;
+        cameraErrorOverlay?.classList.remove('hidden');
+        videoEl.classList.add('hidden');
+    };
+
+    const hideCameraError = () => {
+        cameraErrorOverlay?.classList.add('hidden');
+        videoEl.classList.remove('hidden');
+    };
+
     const startScanning = () => {
         stopped = false;
         scannedJanCode = null;
         setStatus('カメラを起動しています…');
+        hideCameraError();
 
         reader
             .decodeFromConstraints(
@@ -112,10 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             )
             .catch(() => {
-                setStatus('カメラを利用できませんでした。カメラへのアクセスを許可するか、JANコードを手入力してください。');
+                showCameraError('カメラを起動できませんでした。\nアクセスを許可してから再起動するか、JANコードを手入力してください。');
+                setStatus('');
                 manualForm?.classList.remove('hidden');
             });
     };
+
+    cameraRetryBtn?.addEventListener('click', () => {
+        reader.reset();
+        startScanning();
+    });
 
     // スキャン成功：動画を隠して即座に商品情報を取得・フォーム表示
     const handleScanResult = async (janCode) => {
